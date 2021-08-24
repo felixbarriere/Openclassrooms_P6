@@ -3,11 +3,19 @@ const bcrypt = require('bcrypt');  //hashage
 const User = require('../model/User');
 const jwt = require('jsonwebtoken');
 
+const MaskData = require('maskdata');  //On utilise Mask Data pour masquer le mail
+const emailMaskOptions = {
+  maskWith: "*",
+  unmaskedStartCharactersBeforeAt: 3,
+  unmaskedCharactersAfterAt: 2,
+  maskAtTheRate: false,
+};
+
 exports.signup = (req, res, next) => {
     bcrypt.hash(req.body.password, 10)  //on execute 10 fois, suffisant et pas trop long
     .then(hash => {                     //méthode asynchrone (donc then/catch)
       const user = new User({
-        email: req.body.email,
+        email: MaskData.maskEmail2(req.body.email, emailMaskOptions),
         password: hash
       });
       user.save()
@@ -18,7 +26,7 @@ exports.signup = (req, res, next) => {
 };
 
 exports.login = (req, res, next) => {
-    User.findOne({ email: req.body.email }) //on vérifie que l'email correspond à un user existant
+    User.findOne({ email: MaskData.maskEmail2(req.body.email, emailMaskOptions) }) //on vérifie que l'email correspond à un user existant
     .then(user => {
       if (!user) {
         return res.status(401).json({ error: 'Utilisateur non trouvé !' });
@@ -30,7 +38,7 @@ exports.login = (req, res, next) => {
           }
           res.status(200).json({
             userId: user._id,
-            token: jwt.sign(            //la fonction "sign" endcodeun nouveau token
+            token: jwt.sign(            //la fonction "sign" encode un nouveau token
                 { userId: user._id },   //le token contien l'id comme payload (données encodées)
                 'RANDOM_TOKEN_SECRET',
                 { expiresIn: '24h' }

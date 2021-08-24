@@ -11,6 +11,8 @@ const helmet = require('helmet');
 
 const session = require('cookie-session');    // 
 const nocache = require('nocache');           //
+const rateLimit = require("express-rate-limit");  //permet de limiter le nombre de requetes de l'utilisateur
+
 
 //Déclarations des routes pour chaque élément
 const saucesRoutes = require('./routes/sauce');
@@ -65,10 +67,12 @@ app.use(express.urlencoded({
   extended: true
 }));
 app.use(express.json());
-app.use(helmet());       
+app.use(helmet());     
 
 //Désactive la mise en cache du navigateur
 app.use(nocache());
+
+
 // Midleware permettant de charger les fichiers qui sont dans le repertoire images
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
