@@ -1,32 +1,25 @@
-const express = require('express');   // Importation d'express
+const express = require('express');   // importation d'express
 
 const mongoose = require('mongoose'); // Plugin Mongoose pour se connecter à la data base Mongo Db
-const path = require('path');         // Plugin qui sert dans l'upload des images et permet de travailler avec les répertoires et chemin de fichier
+const path = require('path');         // permet de travailler avec les répertoires et chemin de fichier
 
-// utilisation du module 'helmet' pour la sécurité en protégeant l'application des failles XSS ciblant les cookies
-// il sécurise nos requêtes HTTP, sécurise les en-têtes, contrôle la prélecture DNS du navigateur, empêche le détournement de clics
-// et ajoute une protection XSS mineure et protège contre le reniflement de TYPE MIME
-// cross-site scripting, sniffing et clickjacking
+// Helmet sécurise nos requêtes HTTP, les en-têtes, contrôle la prélecture DNS du navigateur, empêche le détournement de clics
 const helmet = require('helmet');    
 
-const session = require('cookie-session');    // 
-const nocache = require('nocache');           //
-const rateLimit = require("express-rate-limit");  //permet de limiter le nombre de requetes de l'utilisateur
-
-
-//Déclarations des routes pour chaque élément
+const session = require('cookie-session');   // 
+const nocache = require('nocache');          //
+const rateLimit = require("./middleware/rate-limit");  
 const saucesRoutes = require('./routes/sauce');
 const userRoutes = require('./routes/user');
 
-// utilisation du module 'dotenv' pour masquer les informations de connexion à la base de données à l'aide de variables d'environnement
+// utilisation du module 'dotenv' pour masquer les informations de connexion à la base de données 
 require('dotenv').config();
 
-//comment faire sans mongoose?
-// Connection à la base de données MongoDB avec la sécurité vers le fichier .env pour cacher le mot de passe
+// Connection à la base de données MongoDB avec la sécurité vers le fichier .env pour cacher l'adresse de connexion
 // L'un des avantages que nous avons à utiliser Mongoose pour gérer notre base de données MongoDB est que nous pouvons implémenter des schémas de données stricts
 // qui permettent de rendre notre application plus robuste
 mongoose.connect(process.env.CO_MONGO,
-  { useCreateIndex: true,  //
+  { useCreateIndex: true,  
     useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
@@ -67,16 +60,19 @@ app.use(express.urlencoded({
   extended: true
 }));
 app.use(express.json());
+
+// utilisation du module 'helmet' pour la sécurité en protégeant l'application des failles XSS ciblant les cookies
 app.use(helmet());     
 
-//Désactive la mise en cache du navigateur
+//Désactivation de la mise en cache du navigateur
 app.use(nocache());
 
+//limitation du nombre de requetes 
+app.use(rateLimit);
 
 // Midleware permettant de charger les fichiers qui sont dans le repertoire images
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
-//app.use('/api/new-sauce', stuffRoutes); //?
 app.use('/api/sauces', saucesRoutes);
 app.use('/api/auth', userRoutes);
 
