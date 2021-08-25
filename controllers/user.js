@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');  //hashage
 const User = require('../model/User');
 const jwt = require('jsonwebtoken');
 
-//const MaskData = require('maskdata');  //On utilise Mask Data pour masquer le mail
+const MaskData = require('maskdata');  //On utilise Mask Data pour masquer le mail
 const emailMaskOptions = {
   maskWith: "*",
   unmaskedStartCharactersBeforeAt: 3,
@@ -15,7 +15,7 @@ exports.signup = (req, res, next) => {
     bcrypt.hash(req.body.password, 10)  //on execute 10 fois, suffisant et pas trop long
     .then(hash => {                     //méthode asynchrone (donc then/catch)
       const user = new User({
-        email: req.body.email,
+        email: MaskData.maskEmail2(req.body.email, emailMaskOptions),
         password: hash
       });
       user.save()
@@ -26,7 +26,7 @@ exports.signup = (req, res, next) => {
 };
 
 exports.login = (req, res, next) => {
-    User.findOne({ email: req.body.email}) //on vérifie que l'email correspond à un user existant
+    User.findOne({ email: MaskData.maskEmail2(req.body.email, emailMaskOptions)}) //on vérifie que l'email correspond à un user existant
     .then(user => {
       if (!user) {
         return res.status(401).json({ error: 'Utilisateur non trouvé !' });
