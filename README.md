@@ -15,3 +15,5 @@ Les technologies utilisées pour le back: un server NodeJS, une base de données
 
 Connexion:
 L'utilisateur pour s'inscrire sur l'application doit fournir un email ainsi qu'un mot de passe contenant min 8 caractères (min 1 majuscule, 1 minuscule, 1 chiffre, pas de symboles, espaces autorisés).
+
+Note: MaskData a été utilisé dans une optique de respect du RGPD. Il empeche cependant la lecture clair des mails utilisateurs, c'est pourquoi une branche sans MaskData est disponible.
