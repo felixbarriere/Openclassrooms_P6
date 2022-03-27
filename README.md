@@ -1,7 +1,7 @@
 # Openclassrooms_Projet_6
-Backend d'un site E-commerce (Node.js) - Formation Développeur web
+## Backend d'un site E-commerce (Node.js) - Formation Développeur web
 
-P6-Piquante
+### P6-Piquante
 Projet 6 du parcours DW avec OpenClassrooms: construire une API sécurisée pour une appli d'avis gastronomiques. 
 Compétences évaluées : - Implémenter un modèle logique de données conformément à la réglementation
 - Stocker des données de manière sécurisée
